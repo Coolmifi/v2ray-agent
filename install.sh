@@ -348,17 +348,17 @@ installTools() {
 			fi
 		fi
 
-		if [[ "${centosVersion}" == "6" ]]; then
-			nginxEpel="http://nginx.org/packages/centos/6/x86_64/RPMS/nginx-1.18.0-1.el6.ngx.x86_64.rpm"
-			rpm -ivh ${nginxEpel} >/etc/v2ray-agent/error.log 2>&1
-		elif [[ "${centosVersion}" == "7" ]]; then
-			nginxEpel="http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm"
-			policyCoreUtils="policycoreutils-python.x86_64"
-			rpm -ivh ${nginxEpel} >/etc/v2ray-agent/error.log 2>&1
-		elif [[ "${centosVersion}" == "8" ]]; then
-			nginxEpel="http://nginx.org/packages/centos/8/x86_64/RPMS/nginx-1.18.0-1.el8.ngx.x86_64.rpm"
-			policyCoreUtils="policycoreutils-python-utils-2.9-9.el8.noarch"
-		fi
+		#if [[ "${centosVersion}" == "6" ]]; then
+		#	nginxEpel="http://nginx.org/packages/centos/6/x86_64/RPMS/nginx-1.18.0-1.el6.ngx.x86_64.rpm"
+		#	rpm -ivh ${nginxEpel} >/etc/v2ray-agent/error.log 2>&1
+		#elif [[ "${centosVersion}" == "7" ]]; then
+		#	nginxEpel="http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm"
+		#	policyCoreUtils="policycoreutils-python.x86_64"
+		#	rpm -ivh ${nginxEpel} >/etc/v2ray-agent/error.log 2>&1
+		#elif [[ "${centosVersion}" == "8" ]]; then
+		#	nginxEpel="http://nginx.org/packages/centos/8/x86_64/RPMS/nginx-1.18.0-1.el8.ngx.x86_64.rpm"
+		#	policyCoreUtils="policycoreutils-python-utils-2.9-9.el8.noarch"
+		#fi
 
 		# yum-utils
 		if [[ "${centosVersion}" == "8" ]]; then
@@ -506,82 +506,82 @@ initTLSNginxConfig() {
 		read -r -p "域名:" domain
 	fi
 
-	if [[ -z ${domain} ]]; then
-		echoContent red "  域名不可为空--->"
-		initTLSNginxConfig
-	else
+	#if [[ -z ${domain} ]]; then
+	#	echoContent red "  域名不可为空--->"
+	#	initTLSNginxConfig
+	#else
 		# 修改配置
-		echoContent green "\n ---> 配置Nginx"
-		touch /etc/nginx/conf.d/alone.conf
-		echo "server {listen 80;listen [::]:80;server_name ${domain};root /usr/share/nginx/html;location ~ /.well-known {allow all;}location /test {return 200 'fjkvymb6len';}}" >/etc/nginx/conf.d/alone.conf
+		#echoContent green "\n ---> 配置Nginx"
+		#touch /etc/nginx/conf.d/alone.conf
+		#echo "server {listen 80;listen [::]:80;server_name ${domain};root /usr/share/nginx/html;location ~ /.well-known {allow all;}location /test {return 200 'fjkvymb6len';}}" >/etc/nginx/conf.d/alone.conf
 		# 启动nginx
-		handleNginx start
+		#handleNginx start
 		echoContent yellow "\n检查IP是否设置为当前VPS"
 		checkIP
 		# 测试nginx
-		echoContent yellow "\n检查Nginx是否正常访问"
-		sleep 0.5
-		domainResult=$(curl -s "${domain}/test" | grep fjkvymb6len)
-		if [[ -n ${domainResult} ]]; then
-			handleNginx stop
-			echoContent green "\n ---> Nginx配置成功"
-		else
-			echoContent red " ---> 无法正常访问服务器，请检测域名是否正确、域名的DNS解析以及防火墙设置是否正确--->"
-			exit 0
-		fi
-	fi
+		#echoContent yellow "\n检查Nginx是否正常访问"
+		#sleep 0.5
+		#domainResult=$(curl -s "${domain}/test" | grep fjkvymb6len)
+		#if [[ -n ${domainResult} ]]; then
+		#	handleNginx stop
+		#	echoContent green "\n ---> Nginx配置成功"
+		#else
+		#	echoContent red " ---> 无法正常访问服务器，请检测域名是否正确、域名的DNS解析以及防火墙设置是否正确--->"
+		#	exit 0
+		#fi
+	#fi
 }
 
 # 修改nginx重定向配置
-updateRedirectNginxConf() {
-
-	cat <<EOF >/etc/nginx/conf.d/alone.conf
-    server {
-        listen 80;
-        listen [::]:80;
-        server_name ${domain};
-        # shellcheck disable=SC2154
-        return 301 https://${domain}$request_uri;
-    }
-EOF
-
-	if [[ "${debianVersion}" == "8" ]]; then
-		cat <<EOF >>/etc/nginx/conf.d/alone.conf
-        server {
-        listen 31300;
-        server_name ${domain};
-        root /usr/share/nginx/html;
-        location /s/ {
-        	add_header Content-Type text/plain;
-        	alias /etc/v2ray-agent/subscribe/;
-        }
-        # location / {
-        #   add_header Strict-Transport-Security "max-age=63072000" always;
-        # }
+#updateRedirectNginxConf() {
+#
+#	cat <<EOF >/etc/nginx/conf.d/alone.conf
+#    server {
+#        listen 80;
+#        listen [::]:80;
+#        server_name ${domain};
+#        # shellcheck disable=SC2154
+#        return 301 https://${domain}$request_uri;
+#    }
+#EOF
+#
+#	if [[ "${debianVersion}" == "8" ]]; then
+#		cat <<EOF >>/etc/nginx/conf.d/alone.conf
+#        server {
+#       listen 31300;
+#        server_name ${domain};
+#        root /usr/share/nginx/html;
+#        location /s/ {
+#       	add_header Content-Type text/plain;
+#        	alias /etc/v2ray-agent/subscribe/;
+#        }
+#        # location / {
+#        #   add_header Strict-Transport-Security "max-age=63072000" always;
+#        # }
 #       location ~ /.well-known {allow all;}
 #       location /test {return 200 'fjkvymb6len';}
-    }
-EOF
-	else
-		cat <<EOF >>/etc/nginx/conf.d/alone.conf
-        server {
-            listen 31300;
-            server_name ${domain};
-            root /usr/share/nginx/html;
-            location /s/ {
-            	add_header Content-Type text/plain;
-        		alias /etc/v2ray-agent/subscribe/;
-        	}
-            location / {
-                add_header Strict-Transport-Security "max-age=63072000" always;
-            }
+#    }
+#EOF
+#	else
+#		cat <<EOF >>/etc/nginx/conf.d/alone.conf
+#        server {
+#            listen 31300;
+#            server_name ${domain};
+#            root /usr/share/nginx/html;
+#            location /s/ {
+#            	add_header Content-Type text/plain;
+#        		alias /etc/v2ray-agent/subscribe/;
+#        	}
+#            location / {
+#                add_header Strict-Transport-Security "max-age=63072000" always;
+#            }
     #       location ~ /.well-known {allow all;}
     #       location /test {return 200 'fjkvymb6len';}
-        }
-EOF
-	fi
-
-}
+#        }
+#EOF
+#	fi
+#
+#}
 
 # 检查ip
 checkIP() {
